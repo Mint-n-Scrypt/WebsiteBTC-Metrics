@@ -34,7 +34,14 @@
         <div id="puell-multiple" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 16px; background: #f9f9f9;">Loading Puell Multiple...</div>
         <div id="nupl" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 16px; background: #f9f9f9;">Loading NUPL...</div>
     </div>
-    <div class="legend" id="legend" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 10px; max-width: 800px; margin: 0 auto; font-size: 14px; font-family: Arial, sans-serif;">
+  
+    <!-- 1x2 Grid -->
+    <div class="additional-metrics" id="additional-metrics" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 20px; max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif;">
+        <div id="sharpe-ratio" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 16px; background: #f9f9f9;">Loading Sharpe Ratio...</div>
+        <div id="rsi" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 16px; background: #f9f9f9;">Loading Weekly RSI...</div>
+    </div>
+    <div class="disclaimer" style="font-size: 14px; color: #666; text-align: center; margin-top: 20px;">Data for informational purposes only, not financial advice. Source: CoinGecko. Sharpe Ratio uses a static 4% annual risk-free rate. Updated June 2, 2025.</div>
+      <div class="legend" id="legend" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 10px; max-width: 800px; margin: 0 auto; font-size: 14px; font-family: Arial, sans-serif;">
         <div class="legend-item" style="display: flex; align-items: center;"><span style="background: #28a745; width: 20px; height: 20px; margin-right: 5px; border: 1px solid #ccc; display: inline-block;"></span> Historically awesome accumulation</div>
         <div class="legend-item" style="display: flex; align-items: center;"><span style="background: #90ee90; width: 20px; height: 20px; margin-right: 5px; border: 1px solid #ccc; display: inline-block;"></span> Historically good accumulation</div>
         <div class="legend-item" style="display: flex; align-items: center;"><span style="background: #fff3cd; width: 20px; height: 20px; margin-right: 5px; border: 1px solid #ccc; display: inline-block;"></span> Neutral</div>
@@ -42,18 +49,6 @@
         <div class="legend-item" style="display: flex; align-items: center;"><span style="background: #dc143c; width: 20px; height: 20px; margin-right: 5px; border: 1px solid #ccc; display: inline-block;"></span> Extremely overbought</div>
     </div>
     <div class="disclaimer" style="font-size: 14px; color: #666; text-align: center; margin-top: 20px;">Data for informational purposes only, not financial advice. Source: CoinGecko, Coinmetrics. Updated June 2, 2025.</div>
-
-    <!-- 1x2 Grid -->
-    <div class="additional-metrics" id="additional-metrics" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 20px; max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif;">
-        <div id="sharpe-ratio" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 16px; background: #f9f9f9;">Loading Sharpe Ratio...</div>
-        <div id="rsi" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 16px; background: #f9f9f9;">Loading Weekly RSI...</div>
-    </div>
-    <div class="disclaimer" style="font-size: 14px; color: #666; text-align: center; margin-top: 20px;">Data for informational purposes only, not financial advice. Source: CoinGecko. Sharpe Ratio uses a static 4% annual risk-free rate. Updated June 2, 2025.</div>
-
-    <!-- Explanation Paragraph -->
-    <div class="explanation" style="font-size: 14px; color: #333; text-align: left; max-width: 800px; margin: 20px auto; font-family: Arial, sans-serif; line-height: 1.6;">
-        <strong>Understanding These Metrics:</strong> Bitcoin Price USD reflects the current market value, while Realized Price USD shows the average price at which all Bitcoins last moved, hinting at undervaluation if the market price is lower. MCV Ratio (Market Cap to Realized Value) signals undervaluation below 10 (dark green) or overvaluation above 30 (dark red). Mayer Multiple, price over the 200-day moving average, indicates accumulation below 1 (dark green) or overbought conditions above 3 (dark red). MVRV Ratio compares market to realized value, with < 1 (dark green) suggesting undervaluation and > 5 (dark red) indicating overvaluation. Puell Multiple tracks miner revenue, with < 0.5 (dark green) showing undervaluation and > 6 (dark red) signaling overbought miners. NUPL measures unrealized profit/loss, with < 0 (dark green) indicating capitulation and > 0.75 (dark red) showing euphoria. The Rolling 52 Week Sharpe Ratio assesses risk-adjusted returns, with < 0.5 (dark red) being poor and > 2.5 (dark green) excellent. Weekly RSI gauges momentum, with ≤ 20 (dark green) as very oversold and ≥ 80 (dark red) as very overbought.
-    </div>
 
     <!-- Scripts -->
     <script src="table.js"></script>
