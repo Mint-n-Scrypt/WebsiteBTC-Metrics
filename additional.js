@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const CACHE_DURATION = 14 * 24 * 60 * 60 * 1000;
+
     function getCachedData(key) {
         const data = localStorage.getItem(key);
         const timestamp = localStorage.getItem(key + '_timestamp');
@@ -8,10 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return null;
     }
+
     function setCachedData(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
         localStorage.setItem(key + '_timestamp', Date.now());
     }
+
     function formatTimestamp(timestamp) {
         return new Date(parseInt(timestamp)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
@@ -35,15 +38,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function applyColor(element, value, metricType) {
+        let color;
+        if (metricType === 'rsi') {
+            if (value <= 20) color = 'hsl(120, 50%, 40%)'; // Dark Green (very oversold)
+            else if (value <= 30) color = 'hsl(120, 50%, 60%)'; // Light Green (oversold)
+            else if (value <= 70) color = 'hsl(0, 0%, 90%)'; // Neutral
+            else if (value <= 80) color = 'hsl(0, 50%, 60%)'; // Light Red (overbought)
+            else color = 'hsl(0, 50%, 40%)'; // Dark Red (very overbought)
+        } else if (metricType === 'sharpe') {
+            if (value < 0.5) color = 'hsl(0, 50%, 40%)'; // Dark Red (very poor)
+            else if (value <= 1) color = 'hsl(0, 50%, 60%)'; // Light Red (poor)
+            else if (value <= 2) color = 'hsl(0, 0%, 90%)'; // Neutral
+            else if (value <= 2.5) color = 'hsl(120, 50%, 60%)'; // Light Green (good)
+            else color = 'hsl(120, 50%, 40%)'; // Dark Green (excellent)
+        }
+        element.style.backgroundColor = color;
+        element.style.color = '#fff'; // White text for contrast (adjust if needed for light backgrounds)
+    }
+
     async function loadSharpeRatio() {
         const element = document.getElementById('sharpe-ratio');
         const cacheKey = 'sharpeRatio';
         const cached = getCachedData(cacheKey);
+
         if (cached) {
             const timestamp = localStorage.getItem(cacheKey + '_timestamp');
             element.innerText = `Sharpe Ratio: ${cached.value.toFixed(2)} (Last updated: ${formatTimestamp(timestamp)})`;
+            applyColor(element, cached.value, 'sharpe');
             return;
         }
+
         try {
             const data = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=364&interval=daily');
             const prices = data.prices.map(item => item[1]);
@@ -64,9 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = { value: sharpeRatio };
             setCachedData(cacheKey, result);
             element.innerText = `Sharpe Ratio: ${sharpeRatio.toFixed(2)}`;
+            applyColor(element, sharpeRatio, 'sharpe');
         } catch (error) {
             console.error('Sharpe Ratio error:', error.message);
             element.innerText = cached ? `Sharpe Ratio: ${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` : 'Sharpe Ratio: Data unavailable';
+            if (cached) applyColor(element, cached.value, 'sharpe');
         }
     }
 
@@ -74,11 +101,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const element = document.getElementById('rsi');
         const cacheKey = 'rsi';
         const cached = getCachedData(cacheKey);
+
         if (cached) {
             const timestamp = localStorage.getItem(cacheKey + '_timestamp');
             element.innerText = `Weekly RSI: ${cached.value.toFixed(2)} (Last updated: ${formatTimestamp(timestamp)})`;
+            applyColor(element, cached.value, 'rsi');
             return;
         }
+
         try {
             const data = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=105&interval=daily');
             const prices = data.prices.map(item => item[1]);
@@ -103,9 +133,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = { value: rsi };
             setCachedData(cacheKey, result);
             element.innerText = `Weekly RSI: ${rsi.toFixed(2)}`;
+            applyColor(element, rsi, 'rsi');
         } catch (error) {
             console.error('Weekly RSI error:', error.message);
             element.innerText = cached ? `Weekly RSI: ${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` : 'Weekly RSI: Data unavailable';
+            if (cached) applyColor(element, cached.value, 'rsi');
         }
     }
 
