@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Metrics</title>
+</head>
+<body>
+    <!-- Table -->
+    <div class="metrics-table" id="metrics-table" style="max-width: 800px; margin: 20px auto; padding: 20px; font-family: Arial, sans-serif;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 16px; text-align: center; border: 1px solid #ccc;">
+            <thead>
+                <tr>
+                    <th style="padding: 10px; border: 1px solid #ccc; background: #e0e0e0;">Bitcoin Price USD (24h)</th>
+                    <th style="padding: 10px; border: 1px solid #ccc; background: #e0e0e0;">Realized Price USD</th>
+                    <th style="padding: 10px; border: 1px solid #ccc; background: #e0e0e0;">MCV Ratio</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="btc-price-usd" style="padding: 10px; border: 1px solid #ccc; background: #f9f9f9;">Loading Bitcoin Price...</td>
+                    <td id="realized-price-usd" style="padding: 10px; border: 1px solid #ccc; background: #f9f9f9;">Loading Realized Price...</td>
+                    <td id="mcv-ratio" style="padding: 10px; border: 1px solid #ccc; background: #f9f9f9;">Loading MCV Ratio...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="disclaimer" style="font-size: 14px; color: #666; text-align: center; margin-top: 20px;">Data for informational purposes only, not financial advice. Source: CoinGecko, Coinmetrics. Updated June 2, 2025.</div>
+
+    <!-- 2x2 Grid -->
+    <div class="metrics-grid" id="metrics-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 20px; max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif;">
+        <div id="mayer-multiple" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 16px; background: #f9f9f9;">Loading Mayer Multiple...</div>
+        <div id="mvrv-ratio" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 16px; background: #f9f9f9;">Loading MVRV Ratio...</div>
+        <div id="puell-multiple" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 16px; background: #f9f9f9;">Loading Puell Multiple...</div>
+        <div id="nupl" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 16px; background: #f9f9f9;">Loading NUPL...</div>
+    </div>
+    <div class="legend" id="legend" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 10px; max-width: 800px; margin: 0 auto; font-size: 14px; font-family: Arial, sans-serif;">
+        <div class="legend-item" style="display: flex; align-items: center;"><span style="background: #28a745; width: 20px; height: 20px; margin-right: 5px; border: 1px solid #ccc; display: inline-block;"></span> Historically awesome accumulation</div>
+        <div class="legend-item" style="display: flex; align-items: center;"><span style="background: #90ee90; width: 20px; height: 20px; margin-right: 5px; border: 1px solid #ccc; display: inline-block;"></span> Historically good accumulation</div>
+        <div class="legend-item" style="display: flex; align-items: center;"><span style="background: #fff3cd; width: 20px; height: 20px; margin-right: 5px; border: 1px solid #ccc; display: inline-block;"></span> Neutral</div>
+        <div class="legend-item" style="display: flex; align-items: center;"><span style="background: #f08080; width: 20px; height: 20px; margin-right: 5px; border: 1px solid #ccc; display: inline-block;"></span> Historically overbought</div>
+        <div class="legend-item" style="display: flex; align-items: center;"><span style="background: #dc143c; width: 20px; height: 20px; margin-right: 5px; border: 1px solid #ccc; display: inline-block;"></span> Extremely overbought</div>
+    </div>
+    <div class="disclaimer" style="font-size: 14px; color: #666; text-align: center; margin-top: 20px;">Data for informational purposes only, not financial advice. Source: CoinGecko, Coinmetrics. Updated June 2, 2025.</div>
+
+    <!-- 1x2 Grid -->
+    <div class="additional-metrics" id="additional-metrics" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 20px; max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif;">
+        <div id="sharpe-ratio" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 16px; background: #f9f9f9;">Loading Sharpe Ratio...</div>
+        <div id="rsi" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 16px; background: #f9f9f9;">Loading Weekly RSI...</div>
+    </div>
+    <div class="disclaimer" style="font-size: 14px; color: #666; text-align: center; margin-top: 20px;">Data for informational purposes only, not financial advice. Source: CoinGecko. Sharpe Ratio uses a static 4% annual risk-free rate. Updated June 2, 2025.</div>
+
+    <!-- Scripts -->
+    <script src="table.js"></script>
+    <script src="grid.js"></script>
+    <script src="additional.js"></script>
+</body>
+</html>
