@@ -42,13 +42,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (metricType === 'rsi') {
             if (value <= 30) color = '#28a745'; // Dark Green (very oversold)
             else if (value <= 40) color = '#90ee90'; // Light Green (oversold)
-            else if (value <= 60) color = '#fff3cd'; // Neutral
+            else if (value <= 60) color = '#f9f9f9'; // Neutral
             else if (value <= 70) color = '#f08080'; // Light Red (overbought)
             else color = '#dc143c'; // Dark Red (very overbought)
         } else if (metricType === 'sharpe') {
             if (value < -1) color = '#28a745'; // Dark Green (very poor)
             else if (value <= 0) color = '#90ee90'; // Light Green (poor)
-            else if (value <= 1) color = '#fff3cd'; // Neutral
+            else if (value <= 1) color = '##f9f9f9'; // Neutral
             else if (value <= 2) color = '#f08080'; // Light Red (good)
             else color = '#dc143c'; // Dark Red (excellent)
         }
