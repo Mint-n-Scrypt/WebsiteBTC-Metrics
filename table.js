@@ -166,3 +166,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Error loading table metrics:', error.message, error.stack);
     });
 });
+});
