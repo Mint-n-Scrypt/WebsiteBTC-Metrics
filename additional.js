@@ -41,17 +41,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyColor(element, value, metricType) {
         let color;
         if (metricType === 'rsi') {
-            if (value <= 20) color = 'hsl(120, 50%, 40%)'; // Dark Green (very oversold)
-            else if (value <= 30) color = 'hsl(120, 50%, 60%)'; // Light Green (oversold)
-            else if (value <= 70) color = 'hsl(0, 0%, 90%)'; // Neutral
-            else if (value <= 80) color = 'hsl(0, 50%, 60%)'; // Light Red (overbought)
+            if (value <= 30) color = 'hsl(120, 50%, 40%)'; // Dark Green (very oversold)
+            else if (value <= 40) color = 'hsl(120, 50%, 60%)'; // Light Green (oversold)
+            else if (value <= 60) color = 'hsl(0, 0%, 90%)'; // Neutral
+            else if (value <= 70) color = 'hsl(0, 50%, 60%)'; // Light Red (overbought)
             else color = 'hsl(0, 50%, 40%)'; // Dark Red (very overbought)
         } else if (metricType === 'sharpe') {
-            if (value < 0.5) color = 'hsl(0, 50%, 40%)'; // Dark Red (very poor)
-            else if (value <= 1) color = 'hsl(0, 50%, 60%)'; // Light Red (poor)
-            else if (value <= 2) color = 'hsl(0, 0%, 90%)'; // Neutral
-            else if (value <= 2.5) color = 'hsl(120, 50%, 60%)'; // Light Green (good)
-            else color = 'hsl(120, 50%, 40%)'; // Dark Green (excellent)
+            if (value < -1) color = 'hsl(120, 50%, 40%)'; // Dark Red (very poor)
+            else if (value <= 0) color = 'hsl(120, 50%, 60%)'; // Light Red (poor)
+            else if (value <= 1) color = 'hsl(0, 0%, 90%)'; // Neutral
+            else if (value <= 2) color = 'hsl(0, 50%, 60%)'; // Light Green (good)
+            else color = 'hsl(0, 50%, 40%)'; // Dark Green (excellent)
         }
         element.style.backgroundColor = color;
         element.style.color = '#000000'; // White text for contrast (adjust if needed for light backgrounds)
