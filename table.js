@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const CACHE_DURATION = 14 * 24 * 60 * 60 * 1000;
+    const CACHE_DURATION = 14 * 24 * 60 * 60 * 1000; // 14 days in milliseconds
+
     function getCachedData(key) {
         const data = localStorage.getItem(key);
         const timestamp = localStorage.getItem(key + '_timestamp');
@@ -8,17 +9,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return null;
     }
+
     function setCachedData(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
         localStorage.setItem(key + '_timestamp', Date.now());
     }
+
     function formatTimestamp(timestamp) {
         return new Date(parseInt(timestamp)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
     async function fetchData(url) {
         try {
-            const response = await fetch(url);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5-second timeout
+            const response = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeoutId);
             if (!response.ok) {
                 if (response.status === 429) {
                     console.warn(`Throttling detected for ${url}, retrying once...`);
@@ -31,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return await response.json();
         } catch (error) {
-            throw error;
+            throw error.name === 'AbortError' ? new Error('Request timed out') : error;
         }
     }
 
@@ -95,12 +101,15 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadAllTimeHigh() {
         const element = document.getElementById('ath-price-usd');
         const cacheKey = 'athPriceUsd';
-        
+
         // Check if element exists
         if (!element) {
             console.error('ATH Price USD error: Element with ID "ath-price-usd" not found in DOM');
             return;
         }
+
+        // Set loading state
+        element.innerText = 'Loading ATH...';
 
         const cached = getCachedData(cacheKey);
         if (cached) {
@@ -129,7 +138,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!cmData.data || !Array.isArray(cmData.data)) {
                     throw new Error('Invalid Coin Metrics response: PriceUSD data missing');
                 }
-                const prices = cmData.data.map(item => parseFloat(item.PriceUSD)).filter(price => !isNaN(price));
+                const prices = cmData.data
+                    .map(item => parseFloat(item.PriceUSD))
+                    .filter(price => !isNaN(price));
                 if (prices.length === 0) {
                     throw new Error('No valid PriceUSD data found');
                 }
@@ -154,5 +165,4 @@ document.addEventListener('DOMContentLoaded', () => {
     ]).catch(error => {
         console.error('Error loading table metrics:', error.message, error.stack);
     });
-});
 });
