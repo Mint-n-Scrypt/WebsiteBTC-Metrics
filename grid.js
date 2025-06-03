@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Mayer Multiple error:', error.message);
             element.innerText = cached ? `Mayer Multiple: ${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` : 'Mayer Multiple: Data unavailable';
-            element.style.background = cached ? (cached.value < 0.8 ? '#28a745' : cached.value < 1.3 ? '#90ee90' : cached.value < 2.4 ? '#f3f3f3' : cached.value < 3.0 ? '#f08080' : '#dc143c') : '#f9f9f9';
+            element.style.background = cached ? (cached.value < 0.8 ? '#28a745' : cached.value < 1.3 ? '#90ee90' : cached.value < 2.4 ? '#f9f9f9' : cached.value < 3.0 ? '#f08080' : '#dc143c') : '#f9f9f9';
         }
     }
 
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cached) {
             const timestamp = localStorage.getItem(cacheKey + '_timestamp');
             element.innerText = `MVRV Ratio: ${cached.value.toFixed(2)} (Last updated: ${formatTimestamp(timestamp)})`;
-            element.style.background = cached.value < 0.8 ? '#28a745' : cached.value < 1.2 ? '#90ee90' : cached.value < 2.0 ? '#f3f3f3' : cached.value < 3.0 ? '#f08080' : '#dc143c';
+            element.style.background = cached.value < 0.8 ? '#28a745' : cached.value < 1.2 ? '#90ee90' : cached.value < 2.0 ? '#f9f9f9' : cached.value < 3.0 ? '#f08080' : '#dc143c';
             return;
         }
         try {
@@ -86,11 +86,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = { value: mvrvRatio };
             setCachedData(cacheKey, result);
             element.innerText = `MVRV Ratio: ${mvrvRatio.toFixed(2)}`;
-            element.style.background = mvrvRatio < 0.8 ? '#28a745' : mvrvRatio < 1.2 ? '#90ee90' : mvrvRatio < 2.0 ? '#fff3cd' : mvrvRatio < 3.0 ? '#f08080' : '#dc143c';
+            element.style.background = mvrvRatio < 0.8 ? '#28a745' : mvrvRatio < 1.2 ? '#90ee90' : mvrvRatio < 2.0 ? '#f9f9f9' : mvrvRatio < 3.0 ? '#f08080' : '#dc143c';
         } catch (error) {
             console.error('MVRV Ratio error:', error.message);
             element.innerText = cached ? `MVRV Ratio: ${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` : 'MVRV Ratio: Data unavailable';
-            element.style.background = cached ? (cached.value < 0.8 ? '#28a745' : cached.value < 1.2 ? '#90ee90' : cached.value < 2.0 ? '#f3f3f3' : cached.value < 3.0 ? '#f08080' : '#dc143c') : '#f9f9f9';
+            element.style.background = cached ? (cached.value < 0.8 ? '#28a745' : cached.value < 1.2 ? '#90ee90' : cached.value < 2.0 ? '#f9f9f9' : cached.value < 3.0 ? '#f08080' : '#dc143c') : '#f9f9f9';
         }
     }
 
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cached) {
             const timestamp = localStorage.getItem(cacheKey + '_timestamp');
             element.innerText = `Puell Multiple: ${cached.value.toFixed(2)} (Last updated: ${formatTimestamp(timestamp)})`;
-            element.style.background = cached.value < 0.3 ? '#28a745' : cached.value < 0.5 ? '#90ee90' : cached.value < 1.5 ? '#f3f3f3' : cached.value < 3.0 ? '#f08080' : '#dc143c';
+            element.style.background = cached.value < 0.3 ? '#28a745' : cached.value < 0.5 ? '#90ee90' : cached.value < 1.5 ? '#f9f9f9' : cached.value < 3.0 ? '#f08080' : '#dc143c';
             return;
         }
         try {
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cached) {
             const timestamp = localStorage.getItem(cacheKey + '_timestamp');
             element.innerText = `NUPL: ${cached.value.toFixed(2)} (Last updated: ${formatTimestamp(timestamp)})`;
-            element.style.background = cached.value < -0.4 ? '#28a745' : cached.value < -0.2 ? '#90ee90' : cached.value < 0.5 ? '#f3f3f3' : cached.value < 0.75 ? '#f08080' : '#dc143c';
+            element.style.background = cached.value < -0.4 ? '#28a745' : cached.value < -0.2 ? '#90ee90' : cached.value < 0.5 ? '#f9f9f9' : cached.value < 0.75 ? '#f08080' : '#dc143c';
             return;
         }
         try {
@@ -149,11 +149,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = { value: nupl };
             setCachedData(cacheKey, result);
             element.innerText = `NUPL: ${nupl.toFixed(2)}`;
-            element.style.background = nupl < -0.4 ? '#28a745' : nupl < -0.2 ? '#90ee90' : nupl < 0.5 ? '#fff3cd' : nupl < 0.75 ? '#f08080' : '#dc143c';
+            element.style.background = nupl < -0.4 ? '#28a745' : nupl < -0.2 ? '#90ee90' : nupl < 0.5 ? '#f9f9f9' : nupl < 0.75 ? '#f08080' : '#dc143c';
         } catch (error) {
             console.error('NUPL error:', error.message);
             element.innerText = cached ? `NUPL: ${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` : 'NUPL: Data unavailable';
-            element.style.background = cached ? (cached.value < -0.4 ? '#28a745' : cached.value < -0.2 ? '#90ee90' : cached.value < 0.5 ? '#f3f3f3' : cached.value < 0.75 ? '#f08080' : '#dc143c') : '#f9f9f9';
+            element.style.background = cached ? (cached.value < -0.4 ? '#28a745' : cached.value < -0.2 ? '#90ee90' : cached.value < 0.5 ? '#f9f9f9' : cached.value < 0.75 ? '#f08080' : '#dc143c') : '#f9f9f9';
         }
     }
 
