@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cached) {
             const timestamp = localStorage.getItem(cacheKey + '_timestamp');
             element.innerText = `Mayer Multiple: ${cached.value.toFixed(2)} (Last updated: ${formatTimestamp(timestamp)})`;
-            element.style.background = cached.value < 0.8 ? '#28a745' : cached.value < 1.3 ? '#90ee90' : cached.value < 2.4 ? '#fff3cd' : cached.value < 3.0 ? '#f08080' : '#dc143c';
+            element.style.background = cached.value < 0.8 ? '#28a745' : cached.value < 1.3 ? '#90ee90' : cached.value < 2.4 ? '#f9f9f9' : cached.value < 3.0 ? '#f08080' : '#dc143c';
             return;
         }
         try {
