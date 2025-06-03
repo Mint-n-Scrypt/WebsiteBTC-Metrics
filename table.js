@@ -92,34 +92,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function loadMcvRatio() {
-        const element = document.getElementById('mcv-ratio');
-        const cacheKey = 'mcvRatio';
+    async function loadAllTimeHigh() {
+        const element = document.getElementById('ath-price-usd');
+        const cacheKey = 'athPriceUsd';
         const cached = getCachedData(cacheKey);
         if (cached) {
             const timestamp = localStorage.getItem(cacheKey + '_timestamp');
-            element.innerText = `${cached.value.toFixed(0)} (Last updated: ${formatTimestamp(timestamp)})`;
+            element.innerText = `$${cached.value.toFixed(2)} (Last updated: ${formatTimestamp(timestamp)})`;
             return;
         }
         try {
             const data = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin?market_data=true');
-            const marketCap = data.market_data.market_cap.usd;
-            const volume24h = data.market_data.total_volume.usd;
-            if (volume24h === 0) throw new Error('Zero trading volume');
-            const mcvRatio = marketCap / volume24h;
-            const result = { value: mcvRatio };
+            const athPrice = data.market_data.ath.usd;
+            const result = { value: athPrice };
             setCachedData(cacheKey, result);
-            element.innerText = mcvRatio.toFixed(0);
+            element.innerText = `$${athPrice.toFixed(2)}`;
         } catch (error) {
-            console.error('MCV Ratio error:', error.message);
-            element.innerText = cached ? `${cached.value.toFixed(0)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` : 'MCV Ratio: Data unavailable';
+            console.error('ATH Price USD error:', error.message);
+            element.innerText = cached ? `$${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` : 'ATH Price: Data unavailable';
         }
     }
 
     Promise.all([
         loadBitcoinPrice(),
         loadRealizedPrice(),
-        loadMcvRatio()
+        loadAllTimeHigh()
     ]).catch(error => {
         console.error('Error loading table metrics:', error.message);
     });
