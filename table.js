@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const CACHE_DURATION = 14 * 24 * 60 * 60 * 1000; // 14 days in milliseconds
 
     function getCachedData(key) {
@@ -22,12 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchData(url) {
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5-second timeout
+            setTimeout(() => controller.abort(), 5000); // 5-second timeout
             const response = await fetch(url, { signal: controller.signal });
-            clearTimeout(timeoutId);
             if (!response.ok) {
                 if (response.status === 429) {
-                    console.warn(`Throttling detected for ${url}, retrying once...`);
                     await new Promise(resolve => setTimeout(resolve, 2000));
                     const retryResponse = await fetch(url);
                     if (!retryResponse.ok) throw new Error(`HTTP ${retryResponse.status}`);
@@ -37,12 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return await response.json();
         } catch (error) {
-            throw error.name === 'AbortError' ? new Error('Request timed out') : error;
+            throw error;
         }
     }
 
     async function loadBitcoinPrice() {
         const element = document.getElementById('btc-price-usd');
+        if (!element) return;
         const cacheKey = 'btcPriceUsd';
         const cached = getCachedData(cacheKey);
         if (cached) {
@@ -60,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
             element.innerText = `$${price.toFixed(2)}`;
             element.style.background = change > 0.1 ? '#28a745' : change < -0.1 ? '#dc143c' : '#cccccc';
         } catch (error) {
-            console.error('Bitcoin Price USD error:', error.message);
             element.innerText = cached ? `$${cached.price.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` : 'Bitcoin Price: Data unavailable';
             element.style.background = cached ? (cached.change > 0.1 ? '#28a745' : cached.change < -0.1 ? '#dc143c' : '#cccccc') : '#f9f9f9';
         }
@@ -68,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadRealizedPrice() {
         const element = document.getElementById('realized-price-usd');
+        if (!element) return;
         const cacheKey = 'realizedPriceUsd';
         const cached = getCachedData(cacheKey);
         if (cached) {
@@ -84,7 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setCachedData(cacheKey, result);
             element.innerText = `$${realizedPrice.toFixed(2)}`;
         } catch (error) {
-            console.error('Realized Price USD error:', error.message);
             try {
                 const cgData = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin?market_data=true');
                 const marketCap = cgData.market_data.market_cap.usd;
@@ -100,70 +98,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadAllTimeHigh() {
         const element = document.getElementById('ath-price-usd');
-        const cacheKey = 'athPriceUsd';
-
-        // Check if element exists
-        if (!element) {
-            console.error('ATH Price USD error: Element with ID "ath-price-usd" not found in DOM');
-            return;
-        }
-
-        // Set loading state
+        if (!element) return;
         element.innerText = 'Loading ATH...';
-
+        const cacheKey = 'athPriceUsd';
         const cached = getCachedData(cacheKey);
         if (cached) {
             const timestamp = localStorage.getItem(cacheKey + '_timestamp');
             element.innerText = `$${cached.value.toFixed(2)} (Last updated: ${formatTimestamp(timestamp)})`;
-            console.log('ATH Price USD: Loaded from cache', cached.value);
             return;
         }
-
         try {
-            console.log('ATH Price USD: Fetching from CoinGecko API...');
             const data = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin?market_data=true');
             if (!data.market_data || !data.market_data.ath || !data.market_data.ath.usd) {
-                throw new Error('Invalid API response: ath.usd field missing');
+                throw new Error('Invalid API response');
             }
             const athPrice = data.market_data.ath.usd;
             const result = { value: athPrice };
             setCachedData(cacheKey, result);
             element.innerText = `$${athPrice.toFixed(2)}`;
-            console.log('ATH Price USD: Successfully fetched from CoinGecko', athPrice);
         } catch (error) {
-            console.error('ATH Price USD error (CoinGecko):', error.message, error.stack);
             try {
-                console.log('ATH Price USD: Falling back to Coin Metrics API...');
                 const cmData = await fetchData('https://api.coinmetrics.io/v4/timeseries/market-metrics?assets=btc&metrics=PriceUSD');
                 if (!cmData.data || !Array.isArray(cmData.data)) {
-                    throw new Error('Invalid Coin Metrics response: PriceUSD data missing');
+                    throw new Error('Invalid response');
                 }
-                const prices = cmData.data
-                    .map(item => parseFloat(item.PriceUSD))
-                    .filter(price => !isNaN(price));
+                const prices = cmData.data.map(item => parseFloat(item.PriceUSD)).filter(price => !isNaN(price));
                 if (prices.length === 0) {
-                    throw new Error('No valid PriceUSD data found');
+                    throw new Error('No valid data');
                 }
                 const athPrice = Math.max(...prices);
                 const result = { value: athPrice };
                 setCachedData(cacheKey, result);
                 element.innerText = `$${athPrice.toFixed(2)} (Estimated from Coin Metrics)`;
-                console.log('ATH Price USD: Successfully fetched from Coin Metrics', athPrice);
             } catch (cmError) {
-                console.error('ATH Price USD error (Coin Metrics):', cmError.message, cmError.stack);
-                element.innerText = cached 
-                    ? `$${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` 
-                    : 'ATH Price: Data unavailable';
+                element.innerText = cached ? `$${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` : 'ATH Price: Data unavailable';
             }
         }
     }
 
-    Promise.all([
-        loadBitcoinPrice(),
-        loadRealizedPrice(),
-        loadAllTimeHigh()
-    ]).catch(error => {
-        console.error('Error loading table metrics:', error.message, error.stack);
-    });
-});
+    // Run each function independently
+    await loadBitcoinPrice();
+    await loadRealizedPrice();
+    await loadAllTimeHigh();
 });
