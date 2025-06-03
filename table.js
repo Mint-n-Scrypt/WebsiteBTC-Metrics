@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('ATH Price USD error: Element with ID "ath-price-usd" not found in DOM');
             return;
         }
-    
+
         const cached = getCachedData(cacheKey);
         if (cached) {
             const timestamp = localStorage.getItem(cacheKey + '_timestamp');
@@ -109,26 +109,41 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('ATH Price USD: Loaded from cache', cached.value);
             return;
         }
-    
+
         try {
             console.log('ATH Price USD: Fetching from CoinGecko API...');
             const data = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin?market_data=true');
-            
-            // Verify API response structure
             if (!data.market_data || !data.market_data.ath || !data.market_data.ath.usd) {
                 throw new Error('Invalid API response: ath.usd field missing');
             }
-    
             const athPrice = data.market_data.ath.usd;
             const result = { value: athPrice };
             setCachedData(cacheKey, result);
             element.innerText = `$${athPrice.toFixed(2)}`;
-            console.log('ATH Price USD: Successfully fetched', athPrice);
+            console.log('ATH Price USD: Successfully fetched from CoinGecko', athPrice);
         } catch (error) {
-            console.error('ATH Price USD error:', error.message, error.stack);
-            element.innerText = cached 
-                ? `$${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` 
-                : 'ATH Price: Data unavailable';
+            console.error('ATH Price USD error (CoinGecko):', error.message, error.stack);
+            try {
+                console.log('ATH Price USD: Falling back to Coin Metrics API...');
+                const cmData = await fetchData('https://api.coinmetrics.io/v4/timeseries/market-metrics?assets=btc&metrics=PriceUSD');
+                if (!cmData.data || !Array.isArray(cmData.data)) {
+                    throw new Error('Invalid Coin Metrics response: PriceUSD data missing');
+                }
+                const prices = cmData.data.map(item => parseFloat(item.PriceUSD)).filter(price => !isNaN(price));
+                if (prices.length === 0) {
+                    throw new Error('No valid PriceUSD data found');
+                }
+                const athPrice = Math.max(...prices);
+                const result = { value: athPrice };
+                setCachedData(cacheKey, result);
+                element.innerText = `$${athPrice.toFixed(2)} (Estimated from Coin Metrics)`;
+                console.log('ATH Price USD: Successfully fetched from Coin Metrics', athPrice);
+            } catch (cmError) {
+                console.error('ATH Price USD error (Coin Metrics):', cmError.message, cmError.stack);
+                element.innerText = cached 
+                    ? `$${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` 
+                    : 'ATH Price: Data unavailable';
+            }
         }
     }
 
@@ -137,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadRealizedPrice(),
         loadAllTimeHigh()
     ]).catch(error => {
-        console.error('Error loading table metrics:', error.message);
+        console.error('Error loading table metrics:', error.message, error.stack);
     });
+});
 });
