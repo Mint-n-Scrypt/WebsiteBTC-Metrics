@@ -95,21 +95,40 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadAllTimeHigh() {
         const element = document.getElementById('ath-price-usd');
         const cacheKey = 'athPriceUsd';
+        
+        // Check if element exists
+        if (!element) {
+            console.error('ATH Price USD error: Element with ID "ath-price-usd" not found in DOM');
+            return;
+        }
+    
         const cached = getCachedData(cacheKey);
         if (cached) {
             const timestamp = localStorage.getItem(cacheKey + '_timestamp');
             element.innerText = `$${cached.value.toFixed(2)} (Last updated: ${formatTimestamp(timestamp)})`;
+            console.log('ATH Price USD: Loaded from cache', cached.value);
             return;
         }
+    
         try {
+            console.log('ATH Price USD: Fetching from CoinGecko API...');
             const data = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin?market_data=true');
+            
+            // Verify API response structure
+            if (!data.market_data || !data.market_data.ath || !data.market_data.ath.usd) {
+                throw new Error('Invalid API response: ath.usd field missing');
+            }
+    
             const athPrice = data.market_data.ath.usd;
             const result = { value: athPrice };
             setCachedData(cacheKey, result);
             element.innerText = `$${athPrice.toFixed(2)}`;
+            console.log('ATH Price USD: Successfully fetched', athPrice);
         } catch (error) {
-            console.error('ATH Price USD error:', error.message);
-            element.innerText = cached ? `$${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` : 'ATH Price: Data unavailable';
+            console.error('ATH Price USD error:', error.message, error.stack);
+            element.innerText = cached 
+                ? `$${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` 
+                : 'ATH Price: Data unavailable';
         }
     }
 
