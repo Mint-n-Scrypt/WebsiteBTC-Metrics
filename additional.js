@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
             else color = 'hsl(120, 50%, 40%)'; // Dark Green (excellent)
         }
         element.style.backgroundColor = color;
-        element.style.color = '#fff'; // White text for contrast (adjust if needed for light backgrounds)
+        element.style.color = '#f9f9f9'; // White text for contrast (adjust if needed for light backgrounds)
     }
 
     async function loadSharpeRatio() {
