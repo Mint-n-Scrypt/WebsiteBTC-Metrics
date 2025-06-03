@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(url);
             if (!response.ok) {
                 if (response.status === 429) {
-                    console.warn(`Throttling detected for ${url}, retrying once...`);
                     await new Promise(resolve => setTimeout(resolve, 2000));
                     const retryResponse = await fetch(url);
                     if (!retryResponse.ok) throw new Error(`HTTP ${retryResponse.status}`);
@@ -41,20 +40,20 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyColor(element, value, metricType) {
         let color;
         if (metricType === 'rsi') {
-            if (value <= 30) color = 'hsl(120, 50%, 40%)'; // Dark Green (very oversold)
-            else if (value <= 40) color = 'hsl(120, 50%, 60%)'; // Light Green (oversold)
-            else if (value <= 60) color = 'hsl(0, 0%, 90%)'; // Neutral
-            else if (value <= 70) color = 'hsl(0, 50%, 60%)'; // Light Red (overbought)
-            else color = 'hsl(0, 50%, 40%)'; // Dark Red (very overbought)
+            if (value <= 30) color = '#28a745'; // Dark Green (very oversold)
+            else if (value <= 40) color = '#90ee90'; // Light Green (oversold)
+            else if (value <= 60) color = '#fff3cd'; // Neutral
+            else if (value <= 70) color = '#f08080'; // Light Red (overbought)
+            else color = '#dc143c'; // Dark Red (very overbought)
         } else if (metricType === 'sharpe') {
-            if (value < -1) color = 'hsl(120, 50%, 40%)'; // Dark Red (very poor)
-            else if (value <= 0) color = 'hsl(120, 50%, 60%)'; // Light Red (poor)
-            else if (value <= 1) color = 'hsl(0, 0%, 90%)'; // Neutral
-            else if (value <= 2) color = 'hsl(0, 50%, 60%)'; // Light Green (good)
-            else color = 'hsl(0, 50%, 40%)'; // Dark Green (excellent)
+            if (value < -1) color = '#28a745'; // Dark Green (very poor)
+            else if (value <= 0) color = '#90ee90'; // Light Green (poor)
+            else if (value <= 1) color = '#fff3cd'; // Neutral
+            else if (value <= 2) color = '#f08080'; // Light Red (good)
+            else color = '#dc143c'; // Dark Red (excellent)
         }
         element.style.backgroundColor = color;
-        element.style.color = '#000000'; // White text for contrast (adjust if needed for light backgrounds)
+        element.style.color = '#000000'; // Black text for contrast
     }
 
     async function loadSharpeRatio() {
@@ -91,8 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
             element.innerText = `Sharpe Ratio: ${sharpeRatio.toFixed(2)}`;
             applyColor(element, sharpeRatio, 'sharpe');
         } catch (error) {
-            console.error('Sharpe Ratio error:', error.message);
             element.innerText = cached ? `Sharpe Ratio: ${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` : 'Sharpe Ratio: Data unavailable';
+            element.style.backgroundColor = cached ? element.style.backgroundColor : '#f9f9f9'; // Fallback to gray if no cache
             if (cached) applyColor(element, cached.value, 'sharpe');
         }
     }
@@ -135,8 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
             element.innerText = `Weekly RSI: ${rsi.toFixed(2)}`;
             applyColor(element, rsi, 'rsi');
         } catch (error) {
-            console.error('Weekly RSI error:', error.message);
             element.innerText = cached ? `Weekly RSI: ${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` : 'Weekly RSI: Data unavailable';
+            element.style.backgroundColor = cached ? element.style.backgroundColor : '#f9f9f9'; // Fallback to gray if no cache
             if (cached) applyColor(element, cached.value, 'rsi');
         }
     }
