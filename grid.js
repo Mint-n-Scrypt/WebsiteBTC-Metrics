@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const CACHE_DURATION = 14 * 24 * 60 * 60 * 1000;
+    const CACHE_DURATION = 60 * 60 * 1000;
     function getCachedData(key) {
         const data = localStorage.getItem(key);
         const timestamp = localStorage.getItem(key + '_timestamp');
