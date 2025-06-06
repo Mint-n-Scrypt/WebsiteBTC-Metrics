@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const data = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=105&interval=daily');
+            const data = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=365&interval=daily');
             const prices = data.prices.map(item => item[1]);
             const weeklyPrices = [];
             for (let i = 0; i < prices.length; i += 7) {
@@ -122,12 +122,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             let gains = 0, losses = 0;
             for (let i = changes.length - 14; i < changes.length; i++) {
-                if (changes[i] > 0) gains += changes[i];
-                else losses -= changes[i];
+                if (changes[i] > 0) {
+                    gains += changes[i];
+                } else if (changes[i] < 0) {
+                    losses += Math.abs(changes[i]); // Fix: Ensure losses are positive
+                }
             }
             gains /= 14;
             losses /= 14;
-            const rs = gains / (losses || 0.0001);
+            const rs = losses === 0 ? gains / 0.0001 : gains / losses;
             const rsi = 100 - (100 / (1 + rs));
             const result = { value: rsi };
             setCachedData(cacheKey, result);
