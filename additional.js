@@ -71,20 +71,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const data = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=364&interval=daily');
-            const prices = data.prices.map(item => item[1]);
+            const pricesWithTimestamps = data.prices; // Array of [timestamp, price]
             const weeklyPrices = [];
-            for (let i = 0; i < prices.length; i += 7) {
-                if (prices[i]) weeklyPrices.push(prices[i]);
+            let lastTimestamp = pricesWithTimestamps[0][0];
+            weeklyPrices.push(pricesWithTimestamps[0][1]); // Start with the first price
+
+            // Sample prices approximately every 7 days using timestamps
+            for (let i = 1; i < pricesWithTimestamps.length; i++) {
+                const currentTimestamp = pricesWithTimestamps[i][0];
+                const daysDiff = (currentTimestamp - lastTimestamp) / (1000 * 60 * 60 * 24);
+                if (daysDiff >= 7) {
+                    weeklyPrices.push(pricesWithTimestamps[i][1]);
+                    lastTimestamp = currentTimestamp;
+                }
             }
+
             if (weeklyPrices.length < 52) throw new Error('Insufficient weekly data');
             const returns = [];
             for (let i = 1; i < weeklyPrices.length; i++) {
                 returns.push((weeklyPrices[i] - weeklyPrices[i - 1]) / weeklyPrices[i - 1]);
             }
             const meanReturn = returns.reduce((sum, r) => sum + r, 0) / returns.length;
-            const variance = returns.reduce((sum, r) => sum + Math.pow(r - meanReturn, 2), 0) / returns.length;
+            const variance = returns.reduce((sum, r) => sum + Math.pow(r - meanReturn, 2), 0) / (returns.length - 1); // Use n-1 for sample variance
             const stdDev = Math.sqrt(variance);
-            const riskFreeRate = 0.04 / 52;
+            const riskFreeRate = 0.045 / 52; // 4.5% annual rate (approximate 2025 U.S. Treasury yield)
             const sharpeRatio = ((meanReturn - riskFreeRate) / stdDev) * Math.sqrt(52);
             const result = { value: sharpeRatio };
             setCachedData(cacheKey, result);
@@ -111,28 +121,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const data = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=105&interval=daily');
-            const prices = data.prices.map(item => item[1]);
+            const data = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=728&interval=daily'); // 2 years of data
+            const pricesWithTimestamps = data.prices; // Array of [timestamp, price]
             const weeklyPrices = [];
-            for (let i = 0; i < prices.length; i += 7) {
-                if (prices[i]) weeklyPrices.push(prices[i]);
+            let lastTimestamp = pricesWithTimestamps[0][0];
+            weeklyPrices.push(pricesWithTimestamps[0][1]); // Start with the first price
+
+            // Sample prices approximately every 7 days using timestamps
+            for (let i = 1; i < pricesWithTimestamps.length; i++) {
+                const currentTimestamp = pricesWithTimestamps[i][0];
+                const daysDiff = (currentTimestamp - lastTimestamp) / (1000 * 60 * 60 * 24);
+                if (daysDiff >= 7) {
+                    weeklyPrices.push(pricesWithTimestamps[i][1]);
+                    lastTimestamp = currentTimestamp;
+                }
             }
-            if (weeklyPrices.length < 15) throw new Error('Insufficient weekly data for RSI');
+
+            if (weeklyPrices.length < 104) throw new Error('Insufficient weekly data for RSI'); // Expect ~104 weeks (2 years)
             const changes = [];
             for (let i = 1; i < weeklyPrices.length; i++) {
                 changes.push(weeklyPrices[i] - weeklyPrices[i - 1]);
             }
+
+            // Initial 14-period average for gains and losses
             let gains = 0, losses = 0;
             for (let i = changes.length - 14; i < changes.length; i++) {
                 if (changes[i] > 0) {
                     gains += changes[i];
                 } else if (changes[i] < 0) {
-                    losses += Math.abs(changes[i]); // Use absolute value for losses
+                    losses += Math.abs(changes[i]);
                 }
             }
-            gains /= 14;
-            losses /= 14;
-            const rs = losses === 0 ? gains / 0.0001 : gains / losses; // Avoid division by zero
+            let avgGain = gains / 14;
+            let avgLoss = losses / 14;
+
+            // Apply exponential smoothing for earlier periods
+            for (let i = changes.length - 14 - 1; i >= 0; i--) {
+                avgGain = (avgGain * 13 + (changes[i] > 0 ? changes[i] : 0)) / 14;
+                avgLoss = (avgLoss * 13 + (changes[i] < 0 ? Math.abs(changes[i]) : 0)) / 14;
+            }
+
+            const rs = avgLoss === 0 ? avgGain / 0.0001 : avgGain / avgLoss;
             const rsi = 100 - (100 / (1 + rs));
             const result = { value: rsi };
             setCachedData(cacheKey, result);
@@ -152,4 +181,5 @@ document.addEventListener('DOMContentLoaded', () => {
     ]).catch(error => {
         console.error('Error loading additional metrics:', error.message);
     });
+});
 });
