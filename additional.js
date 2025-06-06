@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const CACHE_DURATION = 60 * 60 * 1000;
+    const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
 
     function getCachedData(key) {
         const data = localStorage.getItem(key);
@@ -56,6 +56,27 @@ document.addEventListener('DOMContentLoaded', () => {
         element.style.color = '#000000'; // Black text for contrast
     }
 
+    async function fetchRiskFreeRate() {
+        const cacheKey = 'riskFreeRate';
+        const cached = getCachedData(cacheKey);
+
+        if (cached) {
+            return cached.value;
+        }
+
+        try {
+            const url = 'https://api.stlouisfed.org/fred/series/observations?series_id=DGS1&sort_order=desc&limit=1&file_type=json';
+            const data = await fetchData(url);
+            const latestYield = parseFloat(data.observations[0].value); // Latest 1-year T-bill yield in percentage (e.g., 4.75)
+            const riskFreeRate = latestYield / 100; // Convert to decimal (e.g., 0.0475)
+            setCachedData(cacheKey, { value: riskFreeRate });
+            return riskFreeRate;
+        } catch (error) {
+            // Fallback to 4.5% if fetch fails
+            return 0.045;
+        }
+    }
+
     async function loadSharpeRatio() {
         const element = document.getElementById('sharpe-ratio');
         const cacheKey = 'sharpeRatio';
@@ -69,6 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            const riskFreeRateAnnual = await fetchRiskFreeRate(); // Fetch dynamic risk-free rate
+            const riskFreeRate = riskFreeRateAnnual / 52; // Convert annual rate to weekly
+
             const data = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=364&interval=daily');
             const prices = data.prices.map(item => item[1]);
             const weeklyPrices = [];
@@ -83,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const meanReturn = returns.reduce((sum, r) => sum + r, 0) / returns.length;
             const variance = returns.reduce((sum, r) => sum + Math.pow(r - meanReturn, 2), 0) / (returns.length - 1);
             const stdDev = Math.sqrt(variance);
-            const riskFreeRate = 0.045 / 52;
             const sharpeRatio = ((meanReturn - riskFreeRate) / stdDev) * Math.sqrt(52);
             const result = { value: sharpeRatio };
             setCachedData(cacheKey, result);
@@ -91,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
             applyColor(element, sharpeRatio, 'sharpe');
         } catch (error) {
             element.innerText = cached ? `Sharpe Ratio: ${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` : 'Sharpe Ratio: Data unavailable';
-            element.style.backgroundColor = cached ? element.style.backgroundColor : '#f9f9f9'; // Fallback to gray if no cache
+            element.style.backgroundColor = cached ? element.style.backgroundColor : '#f9f9f9';
             if (cached) applyColor(element, cached.value, 'sharpe');
         }
     }
@@ -138,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
             applyColor(element, rsi, 'rsi');
         } catch (error) {
             element.innerText = cached ? `Weekly RSI: ${cached.value.toFixed(2)} (Data unavailable, Last updated: ${formatTimestamp(localStorage.getItem(cacheKey + '_timestamp'))})` : 'Weekly RSI: Data unavailable';
-            element.style.backgroundColor = cached ? element.style.backgroundColor : '#f9f9f9'; // Fallback to gray if no cache
+            element.style.backgroundColor = cached ? element.style.backgroundColor : '#f9f9f9';
             if (cached) applyColor(element, cached.value, 'rsi');
         }
     }
