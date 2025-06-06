@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const data = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=105&interval=daily');
+            const data = await fetchData('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=315&interval=daily');
             const prices = data.prices.map(item => item[1]);
             const weeklyPrices = [];
             for (let i = 0; i < prices.length; i += 7) {
