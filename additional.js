@@ -81,9 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 returns.push((weeklyPrices[i] - weeklyPrices[i - 1]) / weeklyPrices[i - 1]);
             }
             const meanReturn = returns.reduce((sum, r) => sum + r, 0) / returns.length;
-            const variance = returns.reduce((sum, r) => sum + Math.pow(r - meanReturn, 2), 0) / returns.length;
+            const variance = returns.reduce((sum, r) => sum + Math.pow(r - meanReturn, 2), 0) / (returns.length - 1);
             const stdDev = Math.sqrt(variance);
-            const riskFreeRate = 0.04 / 52;
+            const riskFreeRate = 0.045 / 52;
             const sharpeRatio = ((meanReturn - riskFreeRate) / stdDev) * Math.sqrt(52);
             const result = { value: sharpeRatio };
             setCachedData(cacheKey, result);
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (changes[i] > 0) {
                     gains += changes[i];
                 } else if (changes[i] < 0) {
-                    losses += Math.abs(changes[i]); // Fix: Ensure losses are positive
+                    losses += Math.abs(changes[i]);
                 }
             }
             gains /= 14;
