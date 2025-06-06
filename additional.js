@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (metricType === 'sharpe') {
             if (value < -1) color = '#28a745'; // Dark Green (very poor)
             else if (value <= 0) color = '#90ee90'; // Light Green (poor)
-            else if (value <= 1) color = '##f9f9f9'; // Neutral
+            else if (value <= 1) color = '#f9f9f9'; // Neutral
             else if (value <= 2) color = '#f08080'; // Light Red (good)
             else color = '#dc143c'; // Dark Red (excellent)
         }
